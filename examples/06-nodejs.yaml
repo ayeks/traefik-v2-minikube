@@ -1,0 +1,54 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: default
+  name: nodejs-demo
+  labels:
+    app: nodejs-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-demo
+  template:
+    metadata:
+      labels:
+        app: nodejs-demo
+    spec:
+      containers:
+        - name: nodejs-demo
+          image: "drupal"
+          ports:
+            - name: web
+              containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-demo
+spec:
+  ports:
+    - protocol: TCP
+      name: web
+      port: 80
+  selector:
+    app: nodejs-demo
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nodejs-demo-nodejs-demo
+  namespace: default
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: PathPrefix(`/nodejs-demo`)
+      kind: Rule
+      services:
+        - name: nodejs-demo
+          port: 80
+
+

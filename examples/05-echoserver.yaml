@@ -1,0 +1,55 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: default
+  name: echoserver
+  labels:
+    app: echoserver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: echoserver
+  template:
+    metadata:
+      labels:
+        app: echoserver
+    spec:
+      containers:
+        - name: echoserver
+          image: k8s.gcr.io/echoserver:1.4
+          ports:
+            - name: web
+              containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echoserver
+
+spec:
+  ports:
+    - protocol: TCP
+      name: web
+      port: 8080
+  selector:
+    app: echoserver
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: echoserver-echoserver
+  namespace: default
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: PathPrefix(`/echoserver`)
+      kind: Rule
+      services:
+        - name: echoserver
+          port: 8080
+
+
