@@ -48,6 +48,22 @@ Access it with: <http://192.168.39.124:32118/whoami/>
 
 The echoserver can be accessed at: <http://192.168.39.124:31570/echoserver>
 
+## WIP: Deploy Prometheus
+
+Deploying Prometheus into minikube works fine. I would like to access the prometheus server at port 80 via a Traefik tngressoute as well.
+The creation of the ingressroute works fine, but when accessing the site at `/prometheus` Traefik returns 404. No idea why that is.
+
+```bash
+./install-prometheus.yaml
+```
+
+Access prometheus with:
+
+```bash
+export POD_NAME=$(kubectl get pods --namespace default -l "app=prometheus,component=server" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace default port-forward $POD_NAME 9090
+```
+
 ## Deletion
 
 ```bash
